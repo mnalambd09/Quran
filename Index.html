@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ইসলামিক পোর্টাল - কুরআন ও হাদিস</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #27ae60;
+            --light-bg: #f4f7f6;
+        }
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+            direction: ltr;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        h2 { color: var(--secondary-color); text-align: center; }
+        
+        /* Quran Section Styles */
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #219150; }
+        
+        audio { width: 100%; margin-top: 10px; }
+
+        /* Hadith Styles */
+        #hadith-box {
+            background: #eef9f1;
+            padding: 20px;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 5px;
+            min-height: 50px;
+            line-height: 1.6;
+        }
+        .loading { font-style: italic; color: #888; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ইসলামিক জ্ঞান ভাণ্ডার</h1>
+    <p>কুরআন তিলাওয়াত ও সহীহ হাদিস পড়ুন</p>
+</header>
+
+<div class="container">
+    <!-- Quran Section -->
+    <div class="section">
+        <h2>সূরা শুনুন ও পড়ুন</h2>
+        <label for="surah-select">একটি সূরা নির্বাচন করুন:</label>
+        <select id="surah-select">
+            <option value="">লোডিং হচ্ছে...</option>
+        </select>
+        
+        <div id="surah-info" style="display:none; text-align:center; margin-top:20px;">
+            <h3 id="surah-name"></h3>
+            <p id="surah-trans"></p>
+            <audio id="audio-player" controls>
+                আপনার ব্রাউজার অডিও সাপোর্ট করে না।
+            </audio>
+        </div>
+    </div>
+
+    <!-- Hadith Section -->
+    <div class="section">
+        <h2>আজকের হাদিস</h2>
+        <div id="hadith-box">
+            বাটনে ক্লিক করলে হাদিস লোড হবে...
+        </div>
+        <button onclick="getRandomHadith()">নতুন হাদিস দেখুন</button>
+    </div>
+</div>
+
+<script>
+    // ১. কুরআন সূরা তালিকা লোড করা (API: AlQuran.cloud)
+    const surahSelect = document.getElementById('surah-select');
+    const surahInfo = document.getElementById('surah-info');
+    const audioPlayer = document.getElementById('audio-player');
+
+    async function fetchSurahs() {
+        try {
+            const response = await fetch('https://api.alquran.cloud/v1/surah');
+            const data = await response.json();
+            surahSelect.innerHTML = '<option value="">-- সূরা বাছাই করুন --</option>';
+            data.data.forEach(surah => {
+                const option = document.createElement('option');
+                option.value = surah.number;
+                option.textContent = `${surah.number}. ${surah.englishName} (${surah.name})`;
+                surahSelect.appendChild(option);
+            });
+        } catch (error) {
+            surahSelect.innerHTML = '<option>ডাটা লোড করতে সমস্যা হয়েছে</option>';
+        }
+    }
+
+    // ২. সূরা সিলেক্ট করলে অডিও এবং তথ্য দেখানো
+    surahSelect.addEventListener('change', async (e) => {
+        const surahNumber = e.target.value;
+        if (!surahNumber) return;
+
+        surahInfo.style.display = 'block';
+        document.getElementById('surah-name').innerText = "লোডিং...";
+        
+        // অডিও লিঙ্ক সেট করা (মিশারী রাশিদ আল-আফাসি)
+        // পূর্ণ সূরার অডিও অনেক ক্ষেত্রে বড় হয়, তাই আমরা Ayah ভিত্তিক অথবা CDN লিঙ্ক ব্যবহার করতে পারি
+        const audioUrl = `https://download.quranicaudio.com/quran/mishari_rashid_alafasy/${surahNumber.padStart(3, '0')}.mp3`;
+        audioPlayer.src = audioUrl;
+        audioPlayer.play();
+
+        // সূরার নাম ও অনুবাদ (Bengali translation available via AlQuran API)
+        const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/bn.bengali`);
+        const data = await response.json();
+        document.getElementById('surah-name').innerText = data.data.name + " (" + data.data.englishName + ")";
+        document.getElementById('surah-trans').innerText = "মোট আয়াত: " + data.data.numberOfAyahs;
+    });
+
+    // ৩. রেন্ডম হাদিস লোড করা (API: Bangla Hadith)
+    async function getRandomHadith() {
+        const hadithBox = document.getElementById('hadith-box');
+        hadithBox.innerHTML = '<span class="loading">হাদিস সংগ্রহ করা হচ্ছে...</span>';
+        
+        try {
+            // এটি একটি ওপেন সোর্স হাদিস এপিআই (Fawaz Ahmed's Hadith API)
+            // আমরা বুখারী শরীফের হাদিসগুলো রেন্ডমলি দেখাব
+            const response = await fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ben-bukhari.json');
+            const data = await response.json();
+            
+            const randomIndex = Math.floor(Math.random() * data.hadiths.length);
+            const hadith = data.hadiths[randomIndex];
+            
+            hadithBox.innerHTML = `<strong>বুখারী শরীফ, হাদিস নং: ${hadith.hadithnumber}</strong><br><br>${hadith.text}`;
+        } catch (error) {
+            hadithBox.innerHTML = "দুঃখিত, হাদিস লোড করা সম্ভব হয়নি। ইন্টারনেট কানেকশন চেক করুন।";
+        }
+    }
+
+    // পেজ লোড হলে সূরাগুলো নিয়ে আসবে
+    fetchSurahs();
+</script>
+
+</body>
+</html>
