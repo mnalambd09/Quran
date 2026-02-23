@@ -7,90 +7,85 @@
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #27ae60;
-            --light-bg: #f4f7f6;
+            --primary-color: #1a5276;
+            --secondary-color: #1e8449;
+            --light-bg: #f0f4f7;
         }
         body {
             font-family: 'Hind Siliguri', sans-serif;
             background-color: var(--light-bg);
-            margin: 0;
-            padding: 0;
-            direction: ltr;
+            margin: 0; padding: 0;
         }
         header {
             background-color: var(--primary-color);
             color: white;
             text-align: center;
-            padding: 20px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 30px 10px;
         }
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
+            max-width: 700px;
+            margin: -30px auto 40px;
+            padding: 25px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        .section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        h2 { color: var(--secondary-color); text-align: center; }
+        .section { margin-bottom: 40px; text-align: center; }
+        h2 { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
-        /* Quran Section Styles */
         select, button {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
             font-size: 16px;
-            cursor: pointer;
+            font-family: 'Hind Siliguri';
         }
         button {
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            transition: 0.3s;
+            font-weight: bold;
+            cursor: pointer;
         }
-        button:hover { background-color: #219150; }
-        
-        audio { width: 100%; margin-top: 10px; }
+        button:hover { background-color: #145a32; }
 
-        /* Hadith Styles */
+        audio { width: 100%; margin-top: 20px; border-radius: 30px; }
+        
+        #surah-name { color: var(--secondary-color); margin-top: 15px; font-size: 24px; }
+        #status-msg { color: #888; font-size: 14px; margin-top: 5px; }
+
         #hadith-box {
-            background: #eef9f1;
+            background: #f9f9f9;
             padding: 20px;
-            border-left: 5px solid var(--secondary-color);
-            border-radius: 5px;
-            min-height: 50px;
-            line-height: 1.6;
+            border-radius: 10px;
+            border-right: 5px solid var(--secondary-color);
+            text-align: right; /* হাদিস সাধারণত ডান দিক থেকে পড়তে সুবিধা হয় তবে বাংলা বাম থেকে হবে */
+            text-align: left;
+            line-height: 1.8;
+            min-height: 100px;
         }
-        .loading { font-style: italic; color: #888; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>ইসলামিক জ্ঞান ভাণ্ডার</h1>
-    <p>কুরআন তিলাওয়াত ও সহীহ হাদিস পড়ুন</p>
+    <h1>আল-কুরআন ও হাদিস</h1>
+    <p>সহজেই সূরা শুনুন এবং বাংলা হাদিস পড়ুন</p>
 </header>
 
 <div class="container">
-    <!-- Quran Section -->
+    <!-- Quran Audio Section -->
     <div class="section">
-        <h2>সূরা শুনুন ও পড়ুন</h2>
-        <label for="surah-select">একটি সূরা নির্বাচন করুন:</label>
-        <select id="surah-select">
+        <h2>সূরা তিলাওয়াত</h2>
+        <select id="surah-select" onchange="playSurah()">
             <option value="">লোডিং হচ্ছে...</option>
         </select>
         
-        <div id="surah-info" style="display:none; text-align:center; margin-top:20px;">
-            <h3 id="surah-name"></h3>
-            <p id="surah-trans"></p>
+        <div id="player-container">
+            <h3 id="surah-name">সূরা নির্বাচন করুন</h3>
+            <p id="status-msg">অডিও লোড হতে কয়েক সেকেন্ড সময় লাগতে পারে</p>
             <audio id="audio-player" controls>
                 আপনার ব্রাউজার অডিও সাপোর্ট করে না।
             </audio>
@@ -99,79 +94,85 @@
 
     <!-- Hadith Section -->
     <div class="section">
-        <h2>আজকের হাদিস</h2>
+        <h2>আজকের হাদিস (বুখারী শরীফ)</h2>
         <div id="hadith-box">
-            বাটনে ক্লিক করলে হাদিস লোড হবে...
+            নিচের বাটনে ক্লিক করে হাদিস পড়ুন...
         </div>
-        <button onclick="getRandomHadith()">নতুন হাদিস দেখুন</button>
+        <button onclick="getRandomHadith()">নতুন হাদিস লোড করুন</button>
     </div>
 </div>
 
 <script>
-    // ১. কুরআন সূরা তালিকা লোড করা (API: AlQuran.cloud)
     const surahSelect = document.getElementById('surah-select');
-    const surahInfo = document.getElementById('surah-info');
     const audioPlayer = document.getElementById('audio-player');
+    const surahNameDisplay = document.getElementById('surah-name');
+    const statusMsg = document.getElementById('status-msg');
 
-    async function fetchSurahs() {
+    // ১. সূরা তালিকা লোড করা
+    async function loadSurahList() {
         try {
-            const response = await fetch('https://api.alquran.cloud/v1/surah');
-            const data = await response.json();
+            const res = await fetch('https://api.alquran.cloud/v1/surah');
+            const data = await res.json();
             surahSelect.innerHTML = '<option value="">-- সূরা বাছাই করুন --</option>';
             data.data.forEach(surah => {
                 const option = document.createElement('option');
                 option.value = surah.number;
-                option.textContent = `${surah.number}. ${surah.englishName} (${surah.name})`;
+                option.text = `${surah.number}. ${surah.englishName} - ${surah.name}`;
                 surahSelect.appendChild(option);
             });
-        } catch (error) {
-            surahSelect.innerHTML = '<option>ডাটা লোড করতে সমস্যা হয়েছে</option>';
+        } catch (err) {
+            surahSelect.innerHTML = '<option>তালিকা লোড করা যায়নি</option>';
         }
     }
 
-    // ২. সূরা সিলেক্ট করলে অডিও এবং তথ্য দেখানো
-    surahSelect.addEventListener('change', async (e) => {
-        const surahNumber = e.target.value;
-        if (!surahNumber) return;
+    // ২. অডিও প্লে করা (ফিক্সড লিঙ্ক)
+    function playSurah() {
+        const num = surahSelect.value;
+        if (!num) return;
 
-        surahInfo.style.display = 'block';
-        document.getElementById('surah-name').innerText = "লোডিং...";
+        const selectedText = surahSelect.options[surahSelect.selectedIndex].text;
+        surahNameDisplay.innerText = selectedText;
+        statusMsg.innerText = "অডিও বাফার হচ্ছে, দয়া করে অপেক্ষা করুন...";
+
+        // ৩ ডিজিটের সংখ্যা তৈরি করা (যেমন: ১ হলে 001, ১০ হলে 010)
+        const paddedNumber = num.toString().padStart(3, '0');
         
-        // অডিও লিঙ্ক সেট করা (মিশারী রাশিদ আল-আফাসি)
-        // পূর্ণ সূরার অডিও অনেক ক্ষেত্রে বড় হয়, তাই আমরা Ayah ভিত্তিক অথবা CDN লিঙ্ক ব্যবহার করতে পারি
-        const audioUrl = `https://download.quranicaudio.com/quran/mishari_rashid_alafasy/${surahNumber.padStart(3, '0')}.mp3`;
+        // নির্ভরযোগ্য অডিও সার্ভার (Mishary Rashid Alafasy)
+        const audioUrl = `https://server8.mp3quran.net/afs/${paddedNumber}.mp3`;
+        
         audioPlayer.src = audioUrl;
-        audioPlayer.play();
+        audioPlayer.load(); // নতুন সোর্স লোড করা
+        
+        // প্লে করার চেষ্টা করা
+        const playPromise = audioPlayer.play();
 
-        // সূরার নাম ও অনুবাদ (Bengali translation available via AlQuran API)
-        const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/bn.bengali`);
-        const data = await response.json();
-        document.getElementById('surah-name').innerText = data.data.name + " (" + data.data.englishName + ")";
-        document.getElementById('surah-trans').innerText = "মোট আয়াত: " + data.data.numberOfAyahs;
-    });
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                statusMsg.innerText = "এখন চলছে...";
+            }).catch(error => {
+                statusMsg.innerText = "অডিও প্লে করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+                console.error("Playback error:", error);
+            });
+        }
+    }
 
-    // ৩. রেন্ডম হাদিস লোড করা (API: Bangla Hadith)
+    // ৩. রেন্ডম হাদিস লোড করা
     async function getRandomHadith() {
         const hadithBox = document.getElementById('hadith-box');
-        hadithBox.innerHTML = '<span class="loading">হাদিস সংগ্রহ করা হচ্ছে...</span>';
-        
+        hadithBox.innerHTML = 'লোডিং...';
         try {
-            // এটি একটি ওপেন সোর্স হাদিস এপিআই (Fawaz Ahmed's Hadith API)
-            // আমরা বুখারী শরীফের হাদিসগুলো রেন্ডমলি দেখাব
             const response = await fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ben-bukhari.json');
             const data = await response.json();
-            
-            const randomIndex = Math.floor(Math.random() * data.hadiths.length);
-            const hadith = data.hadiths[randomIndex];
-            
-            hadithBox.innerHTML = `<strong>বুখারী শরীফ, হাদিস নং: ${hadith.hadithnumber}</strong><br><br>${hadith.text}`;
-        } catch (error) {
-            hadithBox.innerHTML = "দুঃখিত, হাদিস লোড করা সম্ভব হয়নি। ইন্টারনেট কানেকশন চেক করুন।";
+            const randomNum = Math.floor(Math.random() * data.hadiths.length);
+            const hadith = data.hadiths[randomNum];
+            hadithBox.innerHTML = `<strong>হাদিস নং: ${hadith.hadithnumber}</strong><br><br>${hadith.text}`;
+        } catch (e) {
+            hadithBox.innerHTML = "হাদিস লোড করা সম্ভব হয়নি।";
         }
     }
 
-    // পেজ লোড হলে সূরাগুলো নিয়ে আসবে
-    fetchSurahs();
+    // শুরুতে লোড করা
+    loadSurahList();
 </script>
 
 </body>
