@@ -134,6 +134,38 @@
         <p>সহজ তিলাওয়াত, বাংলা অর্থ ও ডিজিটাল জিকির পোর্টাল</p>
     </header>
 
+
+
+<div class="container">
+    <!-- Quran Audio Section -->
+    <div class="section">
+        <h2>সূরা তিলাওয়াত</h2>
+        <select id="surah-select" onchange="playSurah()">
+            <option value="">লোডিং হচ্ছে...</option>
+        </select>
+        
+        <div id="player-container">
+            <h3 id="surah-name">সূরা নির্বাচন করুন</h3>
+            <p id="status-msg">অডিও লোড হতে কয়েক সেকেন্ড সময় লাগতে পারে</p>
+            <audio id="audio-player" controls>
+                আপনার ব্রাউজার অডিও সাপোর্ট করে না।
+            </audio>
+        </div>
+    </div>
+
+    <!-- Hadith Section -->
+    <div class="section">
+        <h2>আজকের হাদিস (বুখারী শরীফ)</h2>
+        <div id="hadith-box">
+            নিচের বাটনে ক্লিক করে হাদিস পড়ুন...
+        </div>
+        <button onclick="getRandomHadith()">নতুন হাদিস লোড করুন</button>
+    </div>
+</div>
+
+
+
+
     <div class="container">
 
         <!-- ১. অর্থসহ সূরা সেকশন -->
@@ -352,6 +384,61 @@
             init();
             loadHadith();
         };
+
+    
+    const surahSelect = document.getElementById('surah-select');
+    const audioPlayer = document.getElementById('audio-player');
+    const surahNameDisplay = document.getElementById('surah-name');
+    const statusMsg = document.getElementById('status-msg');
+
+    // ১. সূরা তালিকা লোড করা
+    async function loadSurahList() {
+        try {
+            const res = await fetch('https://api.alquran.cloud/v1/surah');
+            const data = await res.json();
+            surahSelect.innerHTML = '<option value="">-- সূরা বাছাই করুন --</option>';
+            data.data.forEach(surah => {
+                const option = document.createElement('option');
+                option.value = surah.number;
+                option.text = `${surah.number}. ${surah.englishName} - ${surah.name}`;
+                surahSelect.appendChild(option);
+            });
+        } catch (err) {
+            surahSelect.innerHTML = '<option>তালিকা লোড করা যায়নি</option>';
+        }
+    }
+
+    // ২. অডিও প্লে করা (ফিক্সড লিঙ্ক)
+    function playSurah() {
+        const num = surahSelect.value;
+        if (!num) return;
+
+        const selectedText = surahSelect.options[surahSelect.selectedIndex].text;
+        surahNameDisplay.innerText = selectedText;
+        statusMsg.innerText = "অডিও বাফার হচ্ছে, দয়া করে অপেক্ষা করুন...";
+
+        // ৩ ডিজিটের সংখ্যা তৈরি করা (যেমন: ১ হলে 001, ১০ হলে 010)
+        const paddedNumber = num.toString().padStart(3, '0');
+        
+        // নির্ভরযোগ্য অডিও সার্ভার (Mishary Rashid Alafasy)
+        const audioUrl = `https://server8.mp3quran.net/afs/${paddedNumber}.mp3`;
+        
+        audioPlayer.src = audioUrl;
+        audioPlayer.load(); // নতুন সোর্স লোড করা
+        
+        // প্লে করার চেষ্টা করা
+        const playPromise = audioPlayer.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                statusMsg.innerText = "এখন চলছে...";
+            }).catch(error => {
+                statusMsg.innerText = "অডিও প্লে করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+                console.error("Playback error:", error);
+            });
+        }
+    }
+
     </script>
 </body>
 </html>
