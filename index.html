@@ -11,7 +11,7 @@
     <!-- Lottie Animation Script -->
     <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Global Stats) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -19,37 +19,46 @@
         :root {
             --gold: #d4af37;
             --deep-green: #064e3b;
-            --soft-bg: #f4f7f6;
+            --soft-bg: #fdfbf7;
+            --card-white: rgba(255, 255, 255, 0.9);
         }
 
         body {
             font-family: 'Hind Siliguri', sans-serif;
             background-color: var(--soft-bg);
+            /* Golden Calligraphy Background Pattern */
+            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'), 
+                              linear-gradient(135deg, #fdfbf7 0%, #f5e6ba 100%);
             margin: 0; padding: 0;
             color: #333;
+            min-height: 100vh;
         }
 
-        /* Background Animation */
+        /* Background Lottie Layer */
         .bg-animation {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0.15; pointer-events: none;
+            z-index: -1; opacity: 0.1; pointer-events: none;
         }
 
         header {
             background: linear-gradient(135deg, var(--deep-green), #065f46);
             color: white; text-align: center;
-            padding: 50px 20px; clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+            padding: 50px 20px; 
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
         }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-        /* translation player */
+        /* General Card Style */
         .card-box {
-            background: white; border-radius: 20px; padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 30px;
-            text-align: center; border-bottom: 4px solid var(--gold);
+            background: var(--card-white); border-radius: 20px; padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;
+            text-align: center; border: 1px solid rgba(212, 175, 55, 0.3);
+            backdrop-filter: blur(5px);
         }
 
+        /* Surah Grid */
         .surah-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
         }
@@ -57,18 +66,23 @@
         .surah-card {
             background: white; border-radius: 15px; padding: 25px;
             text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: 0.3s; position: relative; overflow: hidden;
+            transition: 0.3s; border-top: 5px solid var(--gold);
+            position: relative;
         }
 
-        .surah-card:hover { transform: translateY(-8px); }
+        .surah-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
 
-        .arabic-text { font-family: 'Amiri', serif; font-size: 2rem; color: var(--deep-green); }
+        .arabic-text { font-family: 'Amiri', serif; font-size: 2.2rem; color: var(--deep-green); margin-bottom: 10px; }
 
         .btn-main {
-            background: var(--gold); color: white; border: none;
+            background: linear-gradient(135deg, var(--gold), #b8962d);
+            color: white; border: none;
             padding: 12px 25px; border-radius: 50px; cursor: pointer;
             font-weight: bold; margin: 10px 0; font-size: 16px; width: 100%;
+            transition: 0.3s;
         }
+
+        .btn-main:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(184, 150, 45, 0.4); }
 
         .stats-row {
             display: flex; justify-content: space-between;
@@ -79,18 +93,32 @@
 
         /* Tasbih Section */
         .tasbih-box {
-            background: var(--deep-green); color: white; border-radius: 20px;
+            background: linear-gradient(135deg, var(--deep-green), #0a3d31);
+            color: white; border-radius: 20px;
             padding: 40px; text-align: center; margin-top: 40px;
+            border: 2px solid var(--gold);
         }
 
-        #tasbih-display { font-size: 4rem; font-weight: bold; margin: 20px 0; color: var(--gold); }
+        #tasbih-display { font-size: 4.5rem; font-weight: bold; margin: 15px 0; color: var(--gold); text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 
-        select { padding: 12px; border-radius: 8px; border: 1px solid #ddd; width: 100%; max-width: 300px; font-size: 16px; }
+        select { 
+            padding: 12px; border-radius: 8px; border: 2px solid var(--gold); 
+            width: 100%; max-width: 350px; font-size: 16px; font-family: 'Hind Siliguri';
+            outline: none;
+        }
 
-        footer { background: #111; color: white; text-align: center; padding: 30px; margin-top: 50px; }
+        footer { background: #111; color: #aaa; text-align: center; padding: 30px; margin-top: 50px; }
 
-        /* Active playing animation */
-        .playing { border: 2px solid var(--gold) !important; background: #fffdf5 !important; }
+        .playing { border: 2px solid var(--gold) !important; background: #fffdf0 !important; }
+
+        /* Animation for Play button */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .btn-playing { animation: pulse 1.5s infinite; background: var(--deep-green) !important; }
+
     </style>
 </head>
 <body>
@@ -101,69 +129,77 @@
     </div>
 
     <header>
-        <dotlottie-player src="https://lottie.host/8098670c-2646-455b-9f93-4a11b6d17730/6p79pE0A83.json" background="transparent" speed="1" style="width: 120px; height: 120px; margin: 0 auto;" loop autoplay></dotlottie-player>
-        <h1>নূর-আল-কুরআন</h1>
-        <p>ছোট সূরা তিলাওয়াত, বাংলা অর্থ ও গ্লোবাল জিকির প্ল্যাটফর্ম</p>
+        <dotlottie-player src="https://lottie.host/8098670c-2646-455b-9f93-4a11b6d17730/6p79pE0A83.json" background="transparent" speed="1" style="width: 130px; height: 130px; margin: 0 auto;" loop autoplay></dotlottie-player>
+        <h1 style="margin: 10px 0;">নূর-আল-কুরআন</h1>
+        <p>সহজ তিলাওয়াত, বাংলা অর্থ ও ডিজিটাল জিকির পোর্টাল</p>
     </header>
 
     <div class="container">
 
         <!-- ১. অর্থসহ সূরা সেকশন -->
         <div class="card-box">
-            <h2 style="color: var(--deep-green)">বাংলা অর্থসহ সূরা শুনুন</h2>
-            <p>সিলেক্ট করুন (আরবির পর বাংলা অর্থ বাজবে)</p>
+            <h2 style="color: var(--deep-green)">বাংলা অর্থসহ সূরা</h2>
+            <p>সূরা নির্বাচন করুন (আরবির পর বাংলা অনুবাদ স্বয়ংক্রিয়ভাবে বাজবে)</p>
             <select id="select-bangla" onchange="playWithTranslation()">
                 <option value="">-- সূরা বাছাই করুন --</option>
             </select>
-            <div id="translation-status" style="margin-top:10px; font-weight:bold; color:var(--gold);"></div>
+            <div id="translation-status" style="margin-top:15px; font-weight:bold; color:var(--deep-green);"></div>
             <audio id="audio-bangla" controls style="width: 100%; margin-top: 20px;"></audio>
         </div>
 
-        <!-- ২. ১৪টি ছোট সূরা গ্রিড -->
-        <h2 style="text-align: center; color: var(--deep-green); margin: 40px 0;">নির্বাচিত ছোট সূরাসমূহ</h2>
-        <div id="surah-list" class="surah-grid"></div>
+        <!-- ২. ছোট সূরা গ্রিড -->
+        <h2 style="text-align: center; color: var(--deep-green); margin: 40px 0; font-size: 2rem;">নির্বাচিত ১৪টি ছোট সূরা</h2>
+        <div id="surah-list" class="surah-grid">
+            <!-- JS dynamic content -->
+        </div>
 
         <!-- ৩. ডিজিটাল তসবিহ -->
         <div class="tasbih-box">
-            <h2>ডিজিটাল তসবিহ কাউন্টার</h2>
+            <h2 style="margin-bottom: 0;">ডিজিটাল তসবিহ কাউন্টার</h2>
             <div id="tasbih-display">0</div>
-            <button class="btn-main" style="background: white; color: var(--deep-green); width: auto; padding: 15px 40px;" onclick="addTasbih()">আল্লাহু আকবার</button>
+            <button class="btn-main" style="background: white; color: var(--deep-green); width: auto; padding: 15px 50px; font-size: 1.2rem;" onclick="addTasbih()">সুবহানাল্লাহ / আলহামদুলিল্লাহ</button>
             <br>
-            <button onclick="resetTasbih()" style="background:none; border:none; color:white; cursor:pointer; margin-top:15px; text-decoration:underline;">রিসেট কাউন্টার</button>
+            <button onclick="resetTasbih()" style="background:none; border:none; color:white; cursor:pointer; margin-top:20px; text-decoration:underline; opacity: 0.7;">কাউন্টার রিসেট করুন</button>
         </div>
 
-        <!-- ৪. হাদিস সেকশন -->
-        <div class="card-box" style="margin-top: 40px; border-left: 10px solid var(--deep-green);">
-            <h3>আজকের হাদিস (বুখারী শরীফ)</h3>
+        <!-- ৪. হাদিস ও দোয়া সেকশন -->
+        <div class="card-box" style="margin-top: 40px; border-left: 10px solid var(--gold); text-align: left;">
+            <h3 style="color: var(--deep-green); margin-top: 0;">আজকের হাদিস</h3>
             <p id="hadith-content" style="font-size: 18px; line-height: 1.8;">হাদিস লোড হচ্ছে...</p>
-            <button class="btn-main" style="width: auto;" onclick="loadHadith()">নতুন হাদিস পড়ুন</button>
+            <button class="btn-main" style="width: auto; padding: 10px 25px;" onclick="loadHadith()">নতুন হাদিস</button>
+        </div>
+
+        <div class="card-box" style="background: #fff9e6; border: none;">
+            <h3 style="color: #856404;">প্রতিদিনের বিশেষ দোয়া</h3>
+            <p style="font-size: 1.1rem;">"রাব্বানা আতিনা ফিদ্দুনিয়া হাসানাতাও ওয়া ফিল আখিরাতি হাসানাতাও ওয়া কিনা আজাবান নার।"</p>
+            <p><em>অর্থ: হে আমাদের প্রতিপালক! আমাদের ইহকালে ও পরকালে কল্যাণ দান করুন এবং আগুনের শাস্তি থেকে রক্ষা করুন।</em></p>
         </div>
 
     </div>
 
     <footer>
-        <p>&copy; ২০২৪ নূর-আল-কুরআন | এটি একটি সাদাকায়ে জারিয়া প্রজেক্ট</p>
+        <p>&copy; ২০২৪ নূর-আল-কুরআন | একটি সাদাকায়ে জারিয়া প্রজেক্ট</p>
+        <p style="font-size: 12px; margin-top: 10px;">অডিও ক্রেডিট: Mishary Rashid Alafasy</p>
     </footer>
 
     <script>
-        // --- Firebase Config (গ্লোবাল ডাটার জন্য) ---
+        // --- Firebase Config ---
         const firebaseConfig = { databaseURL: "https://islamic-web-demo-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // সূরার তথ্য
-        const surahs = [
+        const surahData = [
             { id: 1, name: "Al-Fatiha", ar: "الفاتحة" },
             { id: 93, name: "Ad-Duha", ar: "الضحى" },
             { id: 94, name: "Ash-Sharh", ar: "الشرح" },
             { id: 103, name: "Al-Asr", ar: "العصر" },
             { id: 105, name: "Al-Fil", ar: "الفيل" },
-            { id: 106, name: "Quraish", ar: "قريش" },
+            { id: 106, name: "Quraish", ar: "قريশ" },
             { id: 107, name: "Al-Ma'un", ar: "الماعون" },
             { id: 108, name: "Al-Kauthar", ar: "الكوثر" },
             { id: 109, name: "Al-Kafirun", ar: "الكافرون" },
             { id: 110, name: "An-Nasr", ar: "النصر" },
-            { id: 111, name: "Al-Masad", ar: "المসদ" },
+            { id: 111, name: "Al-Masad", ar: "المسد" },
             { id: 112, name: "Al-Ikhlas", ar: "الإخلاص" },
             { id: 113, name: "Al-Falaq", ar: "الفلق" },
             { id: 114, name: "An-Nas", ar: "الناس" }
@@ -172,130 +208,148 @@
         let currentPlayingId = null;
         const gridAudio = new Audio();
 
-        // ১. সূরা গ্রিড তৈরি
-        function initApp() {
-            const list = document.getElementById('surah-list');
-            const select = document.getElementById('select-bangla');
+        // ১. অ্যাপ ইনিশিয়ালাইজেশন
+        function init() {
+            const listContainer = document.getElementById('surah-list');
+            const selectElement = document.getElementById('select-bangla');
 
-            surahs.forEach(s => {
-                // ড্রপডাউন অপশন
+            surahData.forEach(surah => {
+                // ড্রপডাউন পপুলেট
                 let opt = document.createElement('option');
-                opt.value = s.id;
-                opt.text = s.name;
-                select.appendChild(opt);
+                opt.value = surah.id;
+                opt.text = `${surah.id}. ${surah.name}`;
+                selectElement.appendChild(opt);
 
                 // কার্ড তৈরি
                 const card = document.createElement('div');
                 card.className = 'surah-card';
-                card.id = `card-${s.id}`;
+                card.id = `card-${surah.id}`;
                 card.innerHTML = `
-                    <div class="arabic-text">${s.ar}</div>
-                    <h3>${s.name}</h3>
-                    <button class="btn-main" id="btn-${s.id}" onclick="toggleSurah(${s.id})">▶ প্লে করুন</button>
+                    <div class="arabic-text">${surah.ar}</div>
+                    <h3 style="margin: 5px 0;">${surah.name}</h3>
+                    <button class="btn-main" id="btn-${surah.id}" onclick="toggleSurah(${surah.id})">▶ প্লে করুন</button>
                     <div class="stats-row">
-                        <span>🎧 প্লে: <b id="p-${s.id}">0</b></span>
-                        <div class="love-icon" onclick="sendLove(${s.id})">❤️ <b id="l-${s.id}">0</b></div>
+                        <span>🎧 প্লে: <b id="p-${surah.id}">0</b></span>
+                        <div class="love-icon" onclick="sendLove(${surah.id})">❤️ <b id="l-${surah.id}">0</b></div>
                     </div>
                 `;
-                list.appendChild(card);
+                listContainer.appendChild(card);
 
-                // Firebase Realtime Listener
-                db.ref('stats/' + s.id).on('value', snap => {
+                // Firebase রিয়েল টাইম লিসেনার
+                db.ref('stats/' + surah.id).on('value', snap => {
                     const data = snap.val() || { p: 0, l: 0 };
-                    document.getElementById(`p-${s.id}`).innerText = data.p;
-                    document.getElementById(`l-${s.id}`).innerText = data.l;
+                    document.getElementById(`p-${surah.id}`).innerText = data.p;
+                    document.getElementById(`l-${surah.id}`).innerText = data.l;
                 });
             });
         }
 
-        // ২. অডিও প্লে/পজ লজিক (Fix: Push handle)
+        // ২. গ্রিড অডিও প্লে/পজ লজিক
         function toggleSurah(id) {
+            const playerBangla = document.getElementById('audio-bangla');
+            playerBangla.pause(); // অনুবাদ প্লেয়ার বন্ধ করা
+
             if (currentPlayingId === id) {
                 if (gridAudio.paused) {
                     gridAudio.play();
-                    updateBtn(id, true);
+                    updateUI(id, true);
                 } else {
                     gridAudio.pause();
-                    updateBtn(id, false);
+                    updateUI(id, false);
                 }
             } else {
-                // নতুন সূরা প্লে
-                if (currentPlayingId) updateBtn(currentPlayingId, false);
+                if (currentPlayingId) updateUI(currentPlayingId, false);
                 
                 currentPlayingId = id;
                 const paddedId = id.toString().padStart(3, '0');
                 gridAudio.src = `https://server8.mp3quran.net/afs/${paddedId}.mp3`;
                 gridAudio.play();
-                updateBtn(id, true);
+                updateUI(id, true);
                 
-                // গ্লোবাল কাউন্ট বাড়ানো
+                // গ্লোবাল প্লে কাউন্ট আপডেট
                 db.ref('stats/' + id + '/p').transaction(c => (c || 0) + 1);
             }
         }
 
-        function updateBtn(id, isPlaying) {
+        function updateUI(id, isPlaying) {
             const btn = document.getElementById(`btn-${id}`);
             const card = document.getElementById(`card-${id}`);
             if (isPlaying) {
                 btn.innerText = "⏸ পজ করুন";
+                btn.classList.add('btn-playing');
                 card.classList.add('playing');
             } else {
                 btn.innerText = "▶ প্লে করুন";
+                btn.classList.remove('btn-playing');
                 card.classList.remove('playing');
             }
         }
 
-        // ৩. অর্থসহ সূরা প্লেয়ার
+        // অডিও শেষ হলে UI ঠিক করা
+        gridAudio.onended = () => {
+            if(currentPlayingId) updateUI(currentPlayingId, false);
+            currentPlayingId = null;
+        };
+
+        // ৩. অনুবাদসহ প্লেয়ার
         function playWithTranslation() {
             const id = document.getElementById('select-bangla').value;
             const player = document.getElementById('audio-bangla');
             const status = document.getElementById('translation-status');
             
             if(!id) return;
-            gridAudio.pause(); // অন্য অডিও বন্ধ করা
+            gridAudio.pause(); 
+            if(currentPlayingId) updateUI(currentPlayingId, false);
             
             const paddedId = id.toString().padStart(3, '0');
-            status.innerText = "লোড হচ্ছে...";
+            status.innerText = "অডিও লোড হচ্ছে...";
             player.src = `https://server13.mp3quran.net/bengali/${paddedId}.mp3`;
-            player.play();
-            player.onplay = () => status.innerText = "অনুবাদসহ বাজছে...";
+            player.play().then(() => {
+                status.innerText = "এখন বাজছে: অর্থসহ তিলাওয়াত";
+            }).catch(e => {
+                status.innerText = "লোড করতে সমস্যা হয়েছে।";
+            });
         }
 
-        // ৪. গ্লোবাল লাভ রিঅ্যাক্ট
+        // ৪. গ্লোবাল লাভ/লাইক
         function sendLove(id) {
             db.ref('stats/' + id + '/l').transaction(c => (c || 0) + 1);
         }
 
-        // ৫. তসবিহ ফাংশন
-        let tCount = parseInt(localStorage.getItem('myTasbih')) || 0;
+        // ৫. তসবিহ লজিক (Local Storage)
+        let tCount = parseInt(localStorage.getItem('nur_tasbih')) || 0;
         document.getElementById('tasbih-display').innerText = tCount;
 
         function addTasbih() {
             tCount++;
             document.getElementById('tasbih-display').innerText = tCount;
-            localStorage.setItem('myTasbih', tCount);
+            localStorage.setItem('nur_tasbih', tCount);
         }
         function resetTasbih() {
-            tCount = 0;
-            document.getElementById('tasbih-display').innerText = 0;
-            localStorage.setItem('myTasbih', 0);
+            if(confirm("আপনি কি তসবিহ রিসেট করতে চান?")) {
+                tCount = 0;
+                document.getElementById('tasbih-display').innerText = 0;
+                localStorage.setItem('nur_tasbih', 0);
+            }
         }
 
-        // ৬. হাদিস লোড
+        // ৬. হাদিস API
         async function loadHadith() {
             const hBox = document.getElementById('hadith-content');
-            hBox.innerText = "সংগ্রহ করা হচ্ছে...";
+            hBox.innerText = "হাদিস সংগ্রহ করা হচ্ছে...";
             try {
+                // বুখারী শরীফ বাংলা API
                 const res = await fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ben-bukhari.json');
                 const data = await res.json();
-                const random = Math.floor(Math.random() * 300);
-                hBox.innerText = data.hadiths[random].text;
-            } catch (e) { hBox.innerText = "ইন্টারনেট সমস্যা। আবার চেষ্টা করুন।"; }
+                const randomIdx = Math.floor(Math.random() * 500); 
+                hBox.innerText = data.hadiths[randomIdx].text;
+            } catch (e) {
+                hBox.innerText = "ইন্টারনেট সংযোগ চেক করুন এবং পুনরায় চেষ্টা করুন।";
+            }
         }
 
-        // Init
         window.onload = () => {
-            initApp();
+            init();
             loadHadith();
         };
     </script>
